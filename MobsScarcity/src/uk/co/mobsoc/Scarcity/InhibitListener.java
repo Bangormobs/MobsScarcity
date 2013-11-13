@@ -1,9 +1,8 @@
 package uk.co.mobsoc.Scarcity;
 
-import net.minecraft.server.v1_6_R3.Material;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -14,6 +13,7 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class InhibitListener implements Listener{
 	public static int ghastCount = 0, blazeCount = 0, mooshroomCount = 0;
@@ -31,8 +31,19 @@ public class InhibitListener implements Listener{
 	@EventHandler
 	public void onSpread(BlockSpreadEvent event){
 		System.out.println("Spreading "+event.getNewState().getType());
-		if(event.getNewState().getBlock()!=Material.FIRE){
+		if(event.getNewState().getBlock().getType()!=Material.FIRE){
 			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerBoneMeal(PlayerInteractEvent event){
+		if(event.hasItem()){
+			if(event.getItem().getType() == Material.INK_SACK){
+				if(event.getItem().getDurability() == 15){
+					event.setCancelled(true);
+				}
+			}
 		}
 	}
 	
