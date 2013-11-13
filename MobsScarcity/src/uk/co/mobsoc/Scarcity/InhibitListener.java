@@ -2,10 +2,12 @@ package uk.co.mobsoc.Scarcity;
 
 import net.minecraft.server.v1_6_R3.Material;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
@@ -14,11 +16,19 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 
 public class InhibitListener implements Listener{
+	public static int ghastCount = 0, blazeCount = 0, mooshroomCount = 0;
+
+	public InhibitListener(Main main) {
+		Bukkit.getPluginManager().registerEvents(this, main);
+	}
+
+	@EventHandler
 	public void onGrow(BlockGrowEvent event){
 		System.out.println("Growing "+event.getNewState().getType());
 		event.setCancelled(true);
 	}
 	
+	@EventHandler
 	public void onSpread(BlockSpreadEvent event){
 		System.out.println("Spreading "+event.getNewState().getType());
 		if(event.getNewState().getBlock()!=Material.FIRE){
@@ -26,6 +36,7 @@ public class InhibitListener implements Listener{
 		}
 	}
 	
+	@EventHandler
 	public void onSpawn(CreatureSpawnEvent event){
 		if(event.isCancelled()){ return ; }
 		event.setCancelled(true);
@@ -76,6 +87,7 @@ public class InhibitListener implements Listener{
 		}
 	}
 	
+	@EventHandler
 	public void onMonsterDied(EntityDeathEvent event){
 		if(event.getEntityType() == EntityType.GHAST){
 			if(ghastCount > 0){
@@ -92,8 +104,8 @@ public class InhibitListener implements Listener{
 		}
 	}
 	
-	public static int ghastCount = 0, blazeCount = 0, mooshroomCount = 0;
 	
+	@EventHandler
 	public void onFish(PlayerFishEvent event){
 		if(event.getState() == PlayerFishEvent.State.CAUGHT_FISH){
 			Biome b = event.getHook().getLocation().getBlock().getBiome();
