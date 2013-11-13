@@ -8,6 +8,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -39,9 +40,11 @@ public class InhibitListener implements Listener{
 	@EventHandler
 	public void onPlayerBoneMeal(PlayerInteractEvent event){
 		if(event.hasItem()){
-			if(event.getItem().getType() == Material.INK_SACK){
-				if(event.getItem().getDurability() == 15){
-					event.setCancelled(true);
+			if(event.getAction() == Action.RIGHT_CLICK_BLOCK){
+				if(event.getItem().getType() == Material.INK_SACK){
+					if(event.getItem().getDurability() == 15){
+						event.setCancelled(true);
+					}
 				}
 			}
 		}
