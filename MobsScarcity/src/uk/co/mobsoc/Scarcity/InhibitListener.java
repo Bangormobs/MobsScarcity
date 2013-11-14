@@ -24,6 +24,10 @@ import org.bukkit.event.world.StructureGrowEvent;
 public class InhibitListener implements Listener{
 	public static int ghastCount = 0, blazeCount = 0, mooshroomCount = 0;
 	public Random rand = new Random();
+	
+	public InhibitListener(Main main) {
+		Bukkit.getPluginManager().registerEvents(this, main);
+	}
 
 	// While in the future I may add a config setup for this, I will use hard-coded config for now.	
 	public ArrayList<EntityType> getAllowedEntities(Biome b){
@@ -133,6 +137,7 @@ public class InhibitListener implements Listener{
 	}
 	// While in the future I may add a config setup for this, I will use hard-coded config for now.
 	public boolean isResourceAllowed(Biome b, Material m){
+		if(m == Material.FIRE){ return true; }
 		if(b == Biome.FOREST || b == Biome.FOREST_HILLS){
 			return false;
 		}else if(b == Biome.DESERT || b == Biome.DESERT_HILLS){
@@ -141,32 +146,32 @@ public class InhibitListener implements Listener{
 			}
 			return false;
 		}else if(b == Biome.PLAINS){
-			if(m == Material.WHEAT || m == Material.CARROT || m == Material.POTATO){
+			if(m == Material.WHEAT || m == Material.CARROT || m == Material.POTATO || m == Material.GRASS){
 				return true;
 			}
 			return false;
 		}else if(b == Biome.SWAMPLAND){
-			if(m == Material.RED_MUSHROOM || m == Material.BROWN_MUSHROOM){
+			if(m == Material.RED_MUSHROOM || m == Material.BROWN_MUSHROOM || m == Material.GRASS){
 				return true;
 			}
 			return false;
-		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS){
+		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS || m == Material.GRASS){
 			if(m == Material.COCOA){
 				return true;
 			}
 			return false;
-		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS){
+		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS || m == Material.GRASS){
 			return false;
-		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS){
+		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS || m == Material.GRASS){
 			return false;
 		}else if(b == Biome.EXTREME_HILLS){
-			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL){
+			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL || m == Material.GRASS){
 				return true;
 			}
 			return false;
 		}else if(b == Biome.OCEAN){
 			return false;
-		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE){
+		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE || m == Material.GRASS){
 			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL){
 				return true;
 			}
@@ -181,9 +186,7 @@ public class InhibitListener implements Listener{
 		return false;
 	}
 
-	public InhibitListener(Main main) {
-		Bukkit.getPluginManager().registerEvents(this, main);
-	}
+
 
 	@EventHandler
 	public void onGrow(BlockGrowEvent event){
@@ -201,9 +204,7 @@ public class InhibitListener implements Listener{
 	
 	@EventHandler
 	public void onSpread(BlockSpreadEvent event){
-		if(event.getNewState().getType() == Material.GRASS){ return; }
-		System.out.println("Spreading "+event.getNewState().getType());
-		if(event.getNewState().getBlock().getType()!=Material.FIRE){
+		if(!isResourceAllowed(event.getBlock().getBiome(), event.getNewState().getType())){
 			event.setCancelled(true);
 		}
 	}
