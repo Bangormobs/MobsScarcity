@@ -1,8 +1,12 @@
 package uk.co.mobsoc.Scarcity;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.TreeType;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -19,6 +23,163 @@ import org.bukkit.event.world.StructureGrowEvent;
 
 public class InhibitListener implements Listener{
 	public static int ghastCount = 0, blazeCount = 0, mooshroomCount = 0;
+	public Random rand = new Random();
+
+	// While in the future I may add a config setup for this, I will use hard-coded config for now.	
+	public ArrayList<EntityType> getAllowedEntities(Biome b){
+		ArrayList<EntityType> entities = new ArrayList<EntityType>();
+		entities.add(EntityType.CREEPER);
+		entities.add(EntityType.ZOMBIE);
+		entities.add(EntityType.SKELETON);
+		entities.add(EntityType.CAVE_SPIDER);
+		entities.add(EntityType.SILVERFISH);
+		entities.add(EntityType.BAT);
+		boolean sorted=false;
+		if(b == Biome.FOREST || b == Biome.FOREST_HILLS){
+			entities.add(EntityType.PIG);
+			sorted = true;
+		}else if(b == Biome.DESERT || b == Biome.DESERT_HILLS){
+			sorted = true;
+		}else if(b == Biome.PLAINS){
+			entities.add(EntityType.CHICKEN);
+			entities.add(EntityType.COW);
+			sorted = true;
+		}else if(b == Biome.SWAMPLAND){
+			entities.add(EntityType.SLIME);
+			sorted = true;
+		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS){
+			entities.add(EntityType.OCELOT);
+			entities.add(EntityType.PIG);
+			sorted = true;
+		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS){
+			entities.add(EntityType.COW);
+			sorted = true;
+		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS){
+			entities.add(EntityType.WOLF);
+			sorted = true;
+		}else if(b == Biome.EXTREME_HILLS){
+			entities.add(EntityType.SHEEP);
+			sorted = true;
+		}else if(b == Biome.OCEAN){
+			entities.add(EntityType.SQUID);
+			sorted = true;
+		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE){
+			entities.add(EntityType.MUSHROOM_COW);
+			sorted = true;
+		}else if(b == Biome.HELL){
+			entities.clear();
+			entities.add(EntityType.BLAZE);
+			entities.add(EntityType.GHAST);
+			entities.add(EntityType.WITHER);
+			entities.add(EntityType.SKELETON);
+			sorted = true;
+		}
+		if(!sorted){
+			System.out.println("Unsure how to deal with Biome "+b+" in getAllowedEntities() - Assuming hostiles only");
+
+		}
+		return entities;
+	}
+	
+	// While in the future I may add a config setup for this, I will use hard-coded config for now.	
+	public boolean isTreeAllowed(Biome b, TreeType t){
+		if(b == Biome.FOREST || b == Biome.FOREST_HILLS){
+			if(t == TreeType.BIRCH || t == TreeType.TREE){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.DESERT || b == Biome.DESERT_HILLS){
+			return false;
+		}else if(b == Biome.PLAINS){
+			if(t== TreeType.TREE){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.SWAMPLAND){
+			if(t == TreeType.SWAMP){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS){
+			if(t == TreeType.JUNGLE || t == TreeType.JUNGLE_BUSH || t == TreeType.BIG_TREE || t == TreeType.SMALL_JUNGLE){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS){
+			if(t == TreeType.REDWOOD || t == TreeType.TALL_REDWOOD){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS){
+			if(t == TreeType.REDWOOD || t == TreeType.TALL_REDWOOD){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.EXTREME_HILLS){
+			return false;
+		}else if(b == Biome.OCEAN){
+			return false;
+		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE){
+			if(t == TreeType.RED_MUSHROOM || t == TreeType.BROWN_MUSHROOM){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.HELL){
+			return false;
+		}
+		System.out.println("Unsure how to deal with Biome "+b+" in isTreeAllowed() - Automatically denying");
+
+		return false;
+	}
+	// While in the future I may add a config setup for this, I will use hard-coded config for now.
+	public boolean isResourceAllowed(Biome b, Material m){
+		if(b == Biome.FOREST || b == Biome.FOREST_HILLS){
+			return false;
+		}else if(b == Biome.DESERT || b == Biome.DESERT_HILLS){
+			if(m == Material.CACTUS){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.PLAINS){
+			if(m == Material.WHEAT || m == Material.CARROT || m == Material.POTATO){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.SWAMPLAND){
+			if(m == Material.RED_MUSHROOM || m == Material.BROWN_MUSHROOM){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS){
+			if(m == Material.COCOA){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS){
+			return false;
+		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS){
+			return false;
+		}else if(b == Biome.EXTREME_HILLS){
+			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.OCEAN){
+			return false;
+		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE){
+			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.HELL){
+			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.NETHER_WARTS){
+				return true;
+			}
+			return false;
+		}
+		System.out.println("Unsure how to deal with Biome "+b+" in isResourceAllowed() - Automatically denying");
+		return false;
+	}
 
 	public InhibitListener(Main main) {
 		Bukkit.getPluginManager().registerEvents(this, main);
@@ -26,14 +187,16 @@ public class InhibitListener implements Listener{
 
 	@EventHandler
 	public void onGrow(BlockGrowEvent event){
-		System.out.println("Growing "+event.getNewState().getType());
-		event.setCancelled(true);
+		if(!isResourceAllowed(event.getBlock().getBiome(), event.getNewState().getType())){
+			event.setCancelled(true);			
+		}
 	}
 	
 	@EventHandler
 	public void onTreeGrow(StructureGrowEvent event){
-		System.out.println("Growing Tree "+event.getSpecies());
-		event.setCancelled(true);
+		if(!isTreeAllowed(event.getBlocks().get(0).getBlock().getBiome(), event.getSpecies())){
+			event.setCancelled(true);
+		}
 	}
 	
 	@EventHandler
@@ -61,51 +224,42 @@ public class InhibitListener implements Listener{
 	@EventHandler
 	public void onSpawn(CreatureSpawnEvent event){
 		if(event.isCancelled()){ return ; }
-		event.setCancelled(true);
-		Location l = event.getEntity().getLocation();
+		Location l = event.getLocation();
 		Biome b = l.getBlock().getBiome();
-		EntityType et = event.getEntityType();
-		if(b==Biome.OCEAN && et == EntityType.SQUID){
-			event.setCancelled(false);
-		}else if((b==Biome.JUNGLE || b==Biome.JUNGLE_HILLS) && et == EntityType.OCELOT){
-			event.setCancelled(false);
-		}else if(b==Biome.SWAMPLAND && et == EntityType.SLIME){
-			event.setCancelled(false);
-		}else if(b==Biome.EXTREME_HILLS && et == EntityType.SHEEP){
-			event.setCancelled(false);
-		}else if(b==Biome.HELL && ( et == EntityType.PIG_ZOMBIE || et == EntityType.GHAST || et == EntityType.MAGMA_CUBE || et==EntityType.BLAZE)){
-			event.setCancelled(false);
-		}else if(b==Biome.MUSHROOM_ISLAND && et==EntityType.MUSHROOM_COW){
-			event.setCancelled(false);
-		}else if((b==Biome.TAIGA || b == Biome.TAIGA_HILLS) && et == EntityType.WOLF){
-			event.setCancelled(false);
-		}else if((b==Biome.ICE_PLAINS || b==Biome.PLAINS) && et == EntityType.COW){
-			event.setCancelled(false);
-		}else if((b==Biome.FOREST || b==Biome.FOREST_HILLS || b==Biome.PLAINS) && et == EntityType.PIG){
-			event.setCancelled(false);
-		}else if((b==Biome.FROZEN_OCEAN || b == Biome.FROZEN_RIVER || b==Biome.PLAINS) && et == EntityType.CHICKEN){
-			event.setCancelled(false);
-		}else if( et == EntityType.CAVE_SPIDER || et == EntityType.SPIDER || et == EntityType.BAT || et == EntityType.SKELETON || et == EntityType.CREEPER || et == EntityType.ZOMBIE || et == EntityType.ENDERMAN || et == EntityType.IRON_GOLEM || et == EntityType.SNOWMAN || et == EntityType.HORSE || et == EntityType.SILVERFISH || et == EntityType.VILLAGER){
-			event.setCancelled(false);
-		}
-		
-		if(event.isCancelled()){
-			// Now we know that we have an invalid spawn for this biome, why not spawn a
-			// valid mob for this area?
-			if(b == Biome.HELL){
+		ArrayList<EntityType> list = getAllowedEntities(b);
+		if(!list.contains(event.getEntityType())){
+			event.setCancelled(true);
+			// This Entity is not allowed here. Lets see if we can spawn in a more natural Mob
+			EntityType eT = null;
+			if(list.size()>0){
+				eT = list.get(rand.nextInt(list.size()));
+			}
+			if(eT == EntityType.GHAST){
+				// 4 ghasts at once. We don't want these at the normal consistency of say... pigs or chickens
 				if(ghastCount<4){
-					event.getEntity().getWorld().spawnEntity(l, EntityType.GHAST);
 					ghastCount++;
-				}else if(blazeCount<50){
-					event.getEntity().getWorld().spawnEntity(l, EntityType.BLAZE);
-					blazeCount++;
-				}
-			}else if( b == Biome.MUSHROOM_ISLAND){
-				if(mooshroomCount < 10){
-					event.getEntity().getWorld().spawnEntity(l, EntityType.MUSHROOM_COW);
-					mooshroomCount++;
+				}else{
+					eT = null;
 				}
 			}
+			if(eT == EntityType.BLAZE){
+				if(blazeCount<50){
+					blazeCount++;
+				}else{
+					eT = null;
+				}
+			}
+			if(eT == EntityType.MUSHROOM_COW){
+				if(mooshroomCount < 10){
+					mooshroomCount++;
+				}else{
+					eT = null;
+				}
+			}
+			if(eT != null){
+				event.getEntity().getWorld().spawnEntity(l, eT);
+			}
+
 		}
 	}
 	
