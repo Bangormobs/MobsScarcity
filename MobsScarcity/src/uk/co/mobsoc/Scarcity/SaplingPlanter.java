@@ -10,33 +10,64 @@ public class SaplingPlanter implements Runnable{
 		setTimer();
 		for(Item e : Bukkit.getWorld(Main.main.worldName).getEntitiesByClass(Item.class)){
 			if(e.getTicksLived() < 100){ continue; }
+			Material blockHere = e.getLocation().getBlock().getType(), blockBelow = e.getLocation().getBlock().getRelative(0, -1,  0).getType();
 			if(e.getItemStack().getType() == Material.SAPLING){
-				Material a = e.getLocation().getBlock().getType();
-				if(a == Material.AIR || a == Material.SNOW || a == Material.LONG_GRASS){
-					Material m = e.getLocation().getBlock().getRelative(0, -1, 0).getType();
-					if(m == Material.GRASS || m == Material.DIRT){
-						e.getLocation().getBlock().setTypeIdAndData(Material.SAPLING.getId(), (byte)e.getItemStack().getDurability(),true);
-						if(e.getItemStack().getAmount() <= 1){
-							e.remove();
-						}else{
-							e.getItemStack().setAmount(e.getItemStack().getAmount()-1);
-						}
+				if(blockHere == Material.AIR || 
+				   blockHere == Material.SNOW || 
+				   blockHere == Material.LONG_GRASS){
+					if(blockBelow == Material.GRASS || 
+					   blockBelow == Material.DIRT){
+						setBlockHere(e);
 					}
 				}
 			}
-			if((e.getItemStack().getType() == Material.RED_MUSHROOM || e.getItemStack().getType() == Material.BROWN_MUSHROOM)){
-				if(e.getLocation().getBlock().getType() == Material.AIR){
-					Material m = e.getLocation().getBlock().getRelative(0, -1, 0).getType();
-					if(m == Material.GRASS || m == Material.DIRT || m == Material.STONE || m == Material.GRAVEL){
-						e.getLocation().getBlock().setTypeIdAndData(e.getItemStack().getTypeId(), (byte)e.getItemStack().getDurability(),true);
-						if(e.getItemStack().getAmount() <= 1){
-							e.remove();
-						}else{
-							e.getItemStack().setAmount(e.getItemStack().getAmount()-1);
-						}
+			if(e.getItemStack().getType() == Material.RED_MUSHROOM ||
+			   e.getItemStack().getType() == Material.BROWN_MUSHROOM){
+				if(blockHere == Material.AIR){
+					if(blockBelow == Material.GRASS ||
+					   blockBelow == Material.DIRT ||
+					   blockBelow == Material.STONE ||
+					   blockBelow == Material.GRAVEL){
+						setBlockHere(e);
 					}
 				}
 			}
+			// TODO: Update to add 1.7.2 flower types
+			if(e.getItemStack().getType() == Material.RED_ROSE ||
+			   e.getItemStack().getType() == Material.YELLOW_FLOWER){
+				if(blockHere == Material.AIR ||
+				   blockHere == Material.LONG_GRASS){
+					if(blockBelow == Material.GRASS || 
+					   blockBelow == Material.DIRT){
+						setBlockHere(e);
+					}
+				}
+			}
+		}
+	}
+	
+	/* Sets the block to one of the items throw into the locaton. Use the setBlockHere(item, material)
+	 * if the item is a different ID to the block
+	 */
+	public void setBlockHere(Item item){
+		int itemId = item.getItemStack().getTypeId();
+		byte itemDura = (byte)item.getItemStack().getDurability();
+		int amount = item.getItemStack().getAmount();
+		item.getLocation().getBlock().setTypeIdAndData(itemId, itemDura,true);
+		if(amount <= 1){
+			item.remove();
+		}else{
+			item.getItemStack().setAmount(amount-1);
+		}
+	}
+	
+	public void setBlockHere(Item item, Material m){
+		item.getLocation().getBlock().setType(m);
+		int amount = item.getItemStack().getAmount();
+		if(amount <= 1){
+			item.remove();
+		}else{
+			item.getItemStack().setAmount(amount-1);
 		}
 	}
 	
