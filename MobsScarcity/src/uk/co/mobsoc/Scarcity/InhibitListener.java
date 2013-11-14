@@ -61,10 +61,10 @@ public class InhibitListener implements Listener{
 		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS){
 			entities.add(EntityType.WOLF);
 			sorted = true;
-		}else if(b == Biome.EXTREME_HILLS){
+		}else if(b == Biome.EXTREME_HILLS || b == Biome.SMALL_MOUNTAINS){
 			entities.add(EntityType.SHEEP);
 			sorted = true;
-		}else if(b == Biome.OCEAN){
+		}else if(b == Biome.OCEAN || b == Biome.FROZEN_OCEAN){
 			entities.add(EntityType.SQUID);
 			sorted = true;
 		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE){
@@ -76,6 +76,8 @@ public class InhibitListener implements Listener{
 			entities.add(EntityType.GHAST);
 			entities.add(EntityType.WITHER);
 			entities.add(EntityType.SKELETON);
+			sorted = true;
+		}else if(b == Biome.RIVER || b == Biome.FROZEN_RIVER){
 			sorted = true;
 		}
 		if(!sorted){
@@ -119,9 +121,9 @@ public class InhibitListener implements Listener{
 				return true;
 			}
 			return false;
-		}else if(b == Biome.EXTREME_HILLS){
+		}else if(b == Biome.EXTREME_HILLS || b == Biome.SMALL_MOUNTAINS){
 			return false;
-		}else if(b == Biome.OCEAN){
+		}else if(b == Biome.OCEAN || b == Biome.FROZEN_OCEAN){
 			return false;
 		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE){
 			if(t == TreeType.RED_MUSHROOM || t == TreeType.BROWN_MUSHROOM){
@@ -129,6 +131,8 @@ public class InhibitListener implements Listener{
 			}
 			return false;
 		}else if(b == Biome.HELL){
+			return false;
+		}else if(b == Biome.RIVER || b == Biome.FROZEN_RIVER){
 			return false;
 		}
 		System.out.println("Unsure how to deal with Biome "+b+" in isTreeAllowed() - Automatically denying");
@@ -151,25 +155,31 @@ public class InhibitListener implements Listener{
 			}
 			return false;
 		}else if(b == Biome.SWAMPLAND){
-			if(m == Material.RED_MUSHROOM || m == Material.BROWN_MUSHROOM || m == Material.GRASS){
+			if(m == Material.RED_MUSHROOM || m == Material.BROWN_MUSHROOM || m == Material.GRASS || m == Material.VINE){
 				return true;
 			}
 			return false;
-		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS || m == Material.GRASS){
-			if(m == Material.COCOA){
+		}else if(b == Biome.JUNGLE || b == Biome.JUNGLE_HILLS){
+			if(m == Material.COCOA || m == Material.GRASS || m == Material.VINE){
 				return true;
 			}
 			return false;
-		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS || m == Material.GRASS){
+		}else if(b == Biome.ICE_PLAINS || b == Biome.ICE_MOUNTAINS){
+			if(m == Material.GRASS){
+				return true;
+			}
 			return false;
-		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS || m == Material.GRASS){
+		}else if(b == Biome.TAIGA || b == Biome.TAIGA_HILLS){
+			if(m == Material.GRASS){
+				return true;
+			}
 			return false;
-		}else if(b == Biome.EXTREME_HILLS){
+		}else if(b == Biome.EXTREME_HILLS || b == Biome.SMALL_MOUNTAINS){
 			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL || m == Material.GRASS){
 				return true;
 			}
 			return false;
-		}else if(b == Biome.OCEAN){
+		}else if(b == Biome.OCEAN || b == Biome.FROZEN_OCEAN){
 			return false;
 		}else if(b == Biome.MUSHROOM_ISLAND || b == Biome.MUSHROOM_SHORE || m == Material.GRASS){
 			if(m == Material.BROWN_MUSHROOM || m == Material.RED_MUSHROOM || m == Material.MYCEL){
@@ -181,6 +191,8 @@ public class InhibitListener implements Listener{
 				return true;
 			}
 			return false;
+		}else if(b == Biome.RIVER || b == Biome.FROZEN_RIVER){
+			return false;
 		}
 		System.out.println("Unsure how to deal with Biome "+b+" in isResourceAllowed() - Automatically denying");
 		return false;
@@ -191,7 +203,8 @@ public class InhibitListener implements Listener{
 	@EventHandler
 	public void onGrow(BlockGrowEvent event){
 		if(!isResourceAllowed(event.getBlock().getBiome(), event.getNewState().getType())){
-			event.setCancelled(true);			
+			event.setCancelled(true);
+			System.out.println("Stopped "+event.getNewState().getType()+ " from growing in "+event.getBlock().getBiome());
 		}
 	}
 	
@@ -199,6 +212,8 @@ public class InhibitListener implements Listener{
 	public void onTreeGrow(StructureGrowEvent event){
 		if(!isTreeAllowed(event.getBlocks().get(0).getBlock().getBiome(), event.getSpecies())){
 			event.setCancelled(true);
+			System.out.println("Stopped "+event.getSpecies()+ " from growing in "+event.getBlocks().get(0).getBlock().getBiome());
+
 		}
 	}
 	
@@ -206,6 +221,8 @@ public class InhibitListener implements Listener{
 	public void onSpread(BlockSpreadEvent event){
 		if(!isResourceAllowed(event.getBlock().getBiome(), event.getNewState().getType())){
 			event.setCancelled(true);
+			System.out.println("Stopped "+event.getNewState().getType()+ " from growing in "+event.getBlock().getBiome());
+
 		}
 	}
 	
@@ -228,39 +245,36 @@ public class InhibitListener implements Listener{
 		Location l = event.getLocation();
 		Biome b = l.getBlock().getBiome();
 		ArrayList<EntityType> list = getAllowedEntities(b);
-		if(!list.contains(event.getEntityType())){
-			event.setCancelled(true);
-			// This Entity is not allowed here. Lets see if we can spawn in a more natural Mob
-			EntityType eT = null;
-			if(list.size()>0){
-				eT = list.get(rand.nextInt(list.size()));
+		event.setCancelled(true);
+		//Ignore natural spawn info... but let's spawn something of our own maybe?
+		EntityType eT = null;
+		if(list.size()>0){
+			eT = list.get(rand.nextInt(list.size()));
+		}
+		if(eT == EntityType.GHAST){
+			// 4 ghasts at once. We don't want these at the normal consistency of say... pigs or chickens
+			if(ghastCount<4){
+				ghastCount++;
+			}else{
+				eT = null;
 			}
-			if(eT == EntityType.GHAST){
-				// 4 ghasts at once. We don't want these at the normal consistency of say... pigs or chickens
-				if(ghastCount<4){
-					ghastCount++;
-				}else{
-					eT = null;
-				}
+		}
+		if(eT == EntityType.BLAZE){
+			if(blazeCount<50){
+				blazeCount++;
+			}else{
+				eT = null;
 			}
-			if(eT == EntityType.BLAZE){
-				if(blazeCount<50){
-					blazeCount++;
-				}else{
-					eT = null;
-				}
-			}
-			if(eT == EntityType.MUSHROOM_COW){
-				if(mooshroomCount < 10){
-					mooshroomCount++;
-				}else{
-					eT = null;
-				}
-			}
-			if(eT != null){
-				event.getEntity().getWorld().spawnEntity(l, eT);
-			}
-
+		}
+		if(eT == EntityType.MUSHROOM_COW){
+			if(mooshroomCount < 10){
+				mooshroomCount++;
+			}else{
+				eT = null;
+		}
+		}
+		if(eT != null){
+			event.getEntity().getWorld().spawnEntity(l, eT);
 		}
 	}
 	
