@@ -15,6 +15,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 
 public class InhibitListener implements Listener{
 	public static int ghastCount = 0, blazeCount = 0, mooshroomCount = 0;
@@ -30,7 +31,14 @@ public class InhibitListener implements Listener{
 	}
 	
 	@EventHandler
+	public void onTreeGrow(StructureGrowEvent event){
+		System.out.println("Growing Tree "+event.getSpecies());
+		event.setCancelled(true);
+	}
+	
+	@EventHandler
 	public void onSpread(BlockSpreadEvent event){
+		if(event.getNewState().getType() == Material.GRASS){ return; }
 		System.out.println("Spreading "+event.getNewState().getType());
 		if(event.getNewState().getBlock().getType()!=Material.FIRE){
 			event.setCancelled(true);

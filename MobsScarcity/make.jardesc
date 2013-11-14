@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/home/triggerhapp/workspace/shared/Dist/MobsScarcity.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/MobsScarcity/make.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/MobsScarcity/.classpath"/>
+        <javaElement handleIdentifier="=MobsScarcity/src"/>
+        <file path="/MobsScarcity/.gitignore"/>
+        <file path="/MobsScarcity/.project"/>
+        <file path="/MobsScarcity/plugin.yml"/>
+    </selectedElements>
+</jardesc>
