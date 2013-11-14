@@ -64,6 +64,21 @@ public class SaplingPlanter implements Runnable{
 					}
 				}
 			}
+			if(e.getItemStack().getType() == Material.POTATO_ITEM){
+				if(blockHere == Material.AIR){
+					if(blockBelow == Material.SOIL){
+						setBlockHere(e, Material.POTATO);
+					}
+				}
+			}
+			if(e.getItemStack().getType() == Material.CARROT_ITEM){
+				if(blockHere == Material.AIR){
+					if(blockBelow == Material.SOIL){
+						setBlockHere(e, Material.CARROT);
+					}
+				}
+			}
+			
 		}
 	}
 	
