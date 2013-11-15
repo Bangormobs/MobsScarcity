@@ -38,7 +38,6 @@ public class InhibitListener implements Listener{
 		entities.add(EntityType.SKELETON);
 		entities.add(EntityType.SPIDER);
 		entities.add(EntityType.CAVE_SPIDER);
-		entities.add(EntityType.SILVERFISH);
 		entities.add(EntityType.BAT);
 		boolean sorted=false;
 		if(b == Biome.FOREST || b == Biome.FOREST_HILLS){
@@ -252,6 +251,8 @@ public class InhibitListener implements Listener{
 	@EventHandler
 	public void onSpawn(CreatureSpawnEvent event){
 		if(event.isCancelled()){ return ; }
+		// Silverfish are a special case. Just leave them be
+		if(event.getEntityType() == EntityType.SILVERFISH){ return; }
 		// This is already a Plugin-forced spawn. Ignore it to avoid inf-loop :3
 		if(event.getSpawnReason() == SpawnReason.CUSTOM){ return; }
 		Location l = event.getLocation();
