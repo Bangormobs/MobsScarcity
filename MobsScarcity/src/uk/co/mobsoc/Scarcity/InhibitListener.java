@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -35,6 +36,7 @@ public class InhibitListener implements Listener{
 		entities.add(EntityType.CREEPER);
 		entities.add(EntityType.ZOMBIE);
 		entities.add(EntityType.SKELETON);
+		entities.add(EntityType.SPIDER);
 		entities.add(EntityType.CAVE_SPIDER);
 		entities.add(EntityType.SILVERFISH);
 		entities.add(EntityType.BAT);
@@ -77,7 +79,7 @@ public class InhibitListener implements Listener{
 			entities.add(EntityType.WITHER);
 			entities.add(EntityType.SKELETON);
 			sorted = true;
-		}else if(b == Biome.RIVER || b == Biome.FROZEN_RIVER){
+		}else if(b == Biome.RIVER || b == Biome.FROZEN_RIVER || b == Biome.BEACH){
 			sorted = true;
 		}
 		if(!sorted){
@@ -145,12 +147,12 @@ public class InhibitListener implements Listener{
 		if(b == Biome.FOREST || b == Biome.FOREST_HILLS){
 			return false;
 		}else if(b == Biome.DESERT || b == Biome.DESERT_HILLS){
-			if(m == Material.CACTUS){
+			if(m == Material.CACTUS || m == Material.PUMPKIN_STEM || m == Material.MELON_STEM || m == Material.PUMPKIN || m == Material.MELON_BLOCK){
 				return true;
 			}
 			return false;
 		}else if(b == Biome.PLAINS){
-			if(m == Material.WHEAT || m == Material.CARROT || m == Material.POTATO || m == Material.GRASS){
+			if(m == Material.CROPS || m == Material.CARROT || m == Material.POTATO || m == Material.GRASS){
 				return true;
 			}
 			return false;
@@ -192,6 +194,14 @@ public class InhibitListener implements Listener{
 			}
 			return false;
 		}else if(b == Biome.RIVER || b == Biome.FROZEN_RIVER){
+			if(m == Material.SUGAR_CANE_BLOCK){
+				return true;
+			}
+			return false;
+		}else if(b == Biome.BEACH){
+			if(m == Material.SUGAR_CANE_BLOCK){
+				return true;
+			}
 			return false;
 		}
 		System.out.println("Unsure how to deal with Biome "+b+" in isResourceAllowed() - Automatically denying");
@@ -221,7 +231,7 @@ public class InhibitListener implements Listener{
 	public void onSpread(BlockSpreadEvent event){
 		if(!isResourceAllowed(event.getBlock().getBiome(), event.getNewState().getType())){
 			event.setCancelled(true);
-			System.out.println("Stopped "+event.getNewState().getType()+ " from growing in "+event.getBlock().getBiome());
+			System.out.println("Stopped "+event.getNewState().getType()+ " from spreading in "+event.getBlock().getBiome());
 
 		}
 	}
@@ -242,6 +252,8 @@ public class InhibitListener implements Listener{
 	@EventHandler
 	public void onSpawn(CreatureSpawnEvent event){
 		if(event.isCancelled()){ return ; }
+		// This is already a Plugin-forced spawn. Ignore it to avoid inf-loop :3
+		if(event.getSpawnReason() == SpawnReason.CUSTOM){ return; }
 		Location l = event.getLocation();
 		Biome b = l.getBlock().getBiome();
 		ArrayList<EntityType> list = getAllowedEntities(b);
@@ -271,7 +283,16 @@ public class InhibitListener implements Listener{
 				mooshroomCount++;
 			}else{
 				eT = null;
+			}
 		}
+		if(eT == EntityType.ZOMBIE || eT == EntityType.SKELETON || eT == EntityType.CREEPER || eT == EntityType.SPIDER || eT == EntityType.CAVE_SPIDER){
+			if(l.getBlock().getLightLevel() >= 8){
+				eT = null;
+			}
+		}else if(eT == EntityType.CHICKEN || eT == EntityType.COW || eT == EntityType.PIG || eT == EntityType.MUSHROOM_COW || eT == EntityType.HORSE){
+			if(l.getBlock().getLightLevel() <= 4){
+				eT = null;
+			}
 		}
 		if(eT != null){
 			event.getEntity().getWorld().spawnEntity(l, eT);
